@@ -1,21 +1,91 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 from flask_bootstrap import Bootstrap
-from _datetime import datetime
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, SelectField
+from wtforms.validators import DataRequired, URL
+from wtforms.widgets import TextArea
 
 app = Flask("__name__")
+app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
 Bootstrap(app)
+
+year = datetime.now().year
+PORT = 5000
+
+# Connect to SQLite
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///campgrounds.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
+
+class Campground(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    image = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    author = db.Column(db.String(255), nullable=True)
+    # def to_dict(self):
+    #     return (column.name: getattr(self, column_name) for column in self.__table__.columns)
+db.create_all()
+
+class CampgroundForm(FlaskForm):
+    name = StringField("Campground Name", validators=[DataRequired()])
+    image = StringField("Campground Image URL", validators=[DataRequired()])
+    description = StringField("Campground Description", widget=TextArea(), validators=[DataRequired()])
+    submit = SubmitField("Create")
+
+
+@app.route('/landing')
+def landing():
+    return render_template("landing.html", year=year)
 
 
 @app.route('/')
-def landing():
-    return render_template("landing.html")
-
-
-@app.route('/campgrounds')
 def home():
-    return render_template("index.html")
+    campgrounds = db.session.query(Campground).all()
+    return render_template("index.html", year=year, campgrounds=campgrounds)
 
+
+@app.route('/new', methods=["GET", "POST"])
+def new_campground():
+    form = CampgroundForm()
+    if form.validate_on_submit():
+        new_campground = Campground(
+            name=request.form["name"],
+            image=request.form["image"],
+            description=request.form["description"]
+        )
+        db.session.add(new_campground)
+        db.session.commit()
+        print({"Success": "Successfully create a new campground."})
+        return redirect(url_for("home"))
+    return render_template("new.html", year=year, form=form)
+
+
+@app.route("/edit", methods=["GET", "POST"])
+def edit_campground():
+    if request.method == "POST":
+        campground_id = request.form["id"]
+        target_campground = Campground.query.get(campground_id)
+        target_campground.name = request.form["name"]
+        target_campground.image = request.form["image"]
+        target_campground.description = request.form["description"]
+        db.session.commit()
+    campground_id = request.args.get("id")
+    selected_campground = Campground.query.get(campground_id)
+    return render_template("show.html", campground=selected_campground)
+
+
+@app.route("/delete")
+def delete_campground():
+    campground_id = request.args.get("id")
+    target_campground = Campground.query.get(campground_id)
+    db.session.delete(target_campground)
+    db.session.commit()
+    return redirect(url_for("home"))
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=PORT, debug=True)

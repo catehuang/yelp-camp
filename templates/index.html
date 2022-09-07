@@ -1,31 +1,33 @@
 {% include "header.html" %}
 
 <div class="container">
-	<header class="jumbotron">
+	<header class="jumbotron text-center">
         <div class="container">
             <h1>Welcome to YelpCamp!</h1>
             <p>View our hand-picked campgrounds from all the world</p>
-            <p>
-                <a class="btn btn-primary" href='/campgrounds/new'>Add a New Campground</a>
-            </p>
+            <a class="btn btn-primary" href={{url_for("new_campground")}}>Add a New Campground</a>
         </div>
     </header>
 
+    {% if campgrounds == [] %}
+    <h5 class="text-center mb-5">There is no campground data.</h5>
+    {% else %}
     <div class="row align-items-center text-center" style="display:flex; flex-wrap: wrap;">
-        <% campgrounds.forEach(function(campground){ %>
-        <div class="col-md-3 col-sm-6">
-            <div class="img-thumbnail"> 
-                <img src="<%= campground.image %>" class="img-fluid">
-                <div class="caption">
-                     <h4> <%= campground.name %> </h4>
+            {% for campground in campgrounds %}
+            <div class="col-md-3 col-sm-6">
+                <div class="img-thumbnail">
+                    <img src={{ campground.image }} alt={{ campground.name }} class="img-fluid">
+                    <div class="caption">
+                         <h4> {{ campground.name }} </h4>
+                    </div>
+                    <p>
+                        <a href="/campgrounds/{{ campground._id }}">More Info</a>
+                    </p>
                 </div>
-                <p>
-                    <a href="/campgrounds/<%= campground._id %>" clss="btn btn-primary">More Info</a>
-                </p>
             </div>
-        </div>
-        <% }) %>
+            {% endfor %}
     </div>
+    {% endif %}
 </div>
 
 {% include "footer.html" %}
