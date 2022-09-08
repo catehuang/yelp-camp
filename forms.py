@@ -12,13 +12,13 @@ class CampgroundForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    name = StringField("User Name", validators=[DataRequired()])
+    name = StringField("Username", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
     password = StringField("Password", validators=[DataRequired()])
+    submit = SubmitField("Register")
 
 
 class LoginForm(FlaskForm):
-    name = StringField("Username", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
     password = StringField("Password", validators=[DataRequired()])
     submit = SubmitField("Login", validators=[DataRequired()])

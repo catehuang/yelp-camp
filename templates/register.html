@@ -1,18 +1,12 @@
+{% import 'bootstrap/wtf.html' as wtf %}
 {% include "header.html" %}
 
-<div class='ui main text container'>
-    <form action='/register' method='POST' class='ui form' style='width: 50%; margin: auto'>
-        <h1 class='ui header centered'>Sign Up</h1>
-        <div class='field'>
-            <tag>Username</tag>
-            <input type='text' name='username' placeholder="Enter username">
-        </div>
-        <div class='field'>
-            <tag>Password</tag>
-            <input type='password' name='password' placeholder="Enter password">
-        </div>
-        <div class='ui center aligned text container'>
-            <button class='ui button basic blue' type='submit'>Sign Up</button>
+<div class='container w-75 bg-light rounded p-5'>
+    <form action={{url_for("register")}} method='POST' class="w-50 mx-auto mt-5 mb-3">
+        <h1 class='text-center'>Sign Up</h1>
+        <div class="mb-3 d-flex flex-column">
+            {{ form.csrf_token }}
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
         </div>
     </form>
 </div>
