@@ -1,11 +1,32 @@
-{% include header %}
+{% include "header.html" %}
 
-<div class="container" style="text-align: center">
-    <h1><%= campground.name %></h1>
+<div class="container w-75" style="text-align: center">
+    <div class="bg-light p-5">
+        <h1>{{ campground.name }}</h1>
 
-    <img src="<%= campground.image %>">
+        <img src={{ campground.image }} alt={{ campground.name }} class="pt-3 pb-5 w-75">
 
-    <p><%= campground.description %></p>
+        <p class="text-left">{{ campground.description }}</p>
+
+    </div>
+
+    <div class="d-flex justify-content-between">
+        {% if campground.id == 1 %}
+        <button type="button" class="btn btn-primary w-10 text-left" disabled>Previous</button>
+        {% else %}
+        <a class="btn btn-primary w-10 text-left" href="{{url_for('show_campground', campground_id=campground.id-1)}}">Previous</a>
+        {% endif %}
+
+        <button type="button" class="btn btn-link" disabled>{{ campground.id }} / {{ total }}</button>
+
+        {% if campground.id == total %}
+        <button type="button" class="btn btn-primary w-10 text-right" disabled>Next</button>
+        {% else %}
+        <a class="btn btn-primary w-10 text-right" href="{{url_for('show_campground', campground_id=campground.id+1)}}">Next</a>
+        {% endif %}
+    </div>
 </div>
 
-{% include footer %}
+
+
+{% include "footer.html" %}

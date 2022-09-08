@@ -26,9 +26,10 @@ class Campground(db.Model):
     image = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255), nullable=True)
-    # def to_dict(self):
-    #     return (column.name: getattr(self, column_name) for column in self.__table__.columns)
+
+
 db.create_all()
+
 
 class CampgroundForm(FlaskForm):
     name = StringField("Campground Name", validators=[DataRequired()])
@@ -62,6 +63,13 @@ def new_campground():
         print({"Success": "Successfully create a new campground."})
         return redirect(url_for("home"))
     return render_template("new.html", year=year, form=form)
+
+
+@app.route("/<int:campground_id>")
+def show_campground(campground_id):
+    total_campgrounds = db.session.query(Campground).count()
+    campground = Campground.query.get(campground_id)
+    return render_template("show.html", year=year, campground=campground, total=total_campgrounds)
 
 
 @app.route("/edit", methods=["GET", "POST"])

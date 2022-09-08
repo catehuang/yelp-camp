@@ -14,14 +14,17 @@
     {% else %}
     <div class="row align-items-center text-center" style="display:flex; flex-wrap: wrap;">
             {% for campground in campgrounds %}
-            <div class="col-md-3 col-sm-6">
+            <div class="col-md-3 col-sm-6 h-50">
                 <div class="img-thumbnail">
-                    <img src={{ campground.image }} alt={{ campground.name }} class="img-fluid">
-                    <div class="caption">
+                    <figure class="figure">
+                        <img src={{ campground.image }} alt={{ campground.name }} class="figure-img img-fluid" style="height: 10rem;">
+                    </figure>
+
+                    <div class="caption mb-2">
                          <h4> {{ campground.name }} </h4>
                     </div>
                     <p>
-                        <a href="/campgrounds/{{ campground._id }}">More Info</a>
+                        <a href="{{url_for("show_campground", campground_id=campground.id)}}">More Info</a>
                     </p>
                 </div>
             </div>
