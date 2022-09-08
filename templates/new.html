@@ -1,9 +1,14 @@
 {% include "header.html" %}
 
 <div class="container w-75 bg-light rounded py-5 mb-5">
+    {% if is_edit %}
+    <h1 class="text-center">Edit a Campground</h1>
+    <form action="{{url_for('edit_campground', campground_id=id)}}" method="POST" class="w-50 mx-auto mt-5 mb-3">
+    {% else %}
     <h1 class="text-center">Create a New Campground</h1>
+    <form action="{{url_for('new_campground')}}" method="POST" class="w-50 mx-auto mt-5 mb-3">
+    {% endif %}
 
-    <form action={{url_for("new_campground")}} method="POST" class="w-50 mx-auto mt-5 mb-3">
         {{form.csrf_token}}
 
         <div class="mb-3 d-flex flex-column">

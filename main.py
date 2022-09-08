@@ -11,7 +11,7 @@ app = Flask("__name__")
 app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
 Bootstrap(app)
 
-year = datetime.now().year
+now = datetime.now()
 PORT = 5000
 
 # Connect to SQLite
@@ -26,7 +26,7 @@ class Campground(db.Model):
     image = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255), nullable=False)
     author = db.Column(db.String(255), nullable=True)
-
+    postedDate = db.Column(db.Date, nullable=True)
 
 db.create_all()
 
@@ -40,13 +40,13 @@ class CampgroundForm(FlaskForm):
 
 @app.route('/landing')
 def landing():
-    return render_template("landing.html", year=year)
+    return render_template("landing.html", now=now)
 
 
 @app.route('/')
 def home():
     campgrounds = db.session.query(Campground).all()
-    return render_template("index.html", year=year, campgrounds=campgrounds)
+    return render_template("index.html", now=now, campgrounds=campgrounds)
 
 
 @app.route('/new', methods=["GET", "POST"])
@@ -56,34 +56,43 @@ def new_campground():
         new_campground = Campground(
             name=request.form["name"],
             image=request.form["image"],
-            description=request.form["description"]
+            description=request.form["description"],
+            postedDate=now
         )
         db.session.add(new_campground)
         db.session.commit()
-        print({"Success": "Successfully create a new campground."})
+        # print({"Success": "Successfully create a new campground."})
         return redirect(url_for("home"))
-    return render_template("new.html", year=year, form=form)
+    return render_template("new.html", now=now, form=form)
 
 
 @app.route("/<int:campground_id>")
 def show_campground(campground_id):
     total_campgrounds = db.session.query(Campground).count()
     campground = Campground.query.get(campground_id)
-    return render_template("show.html", year=year, campground=campground, total=total_campgrounds)
+    return render_template("show.html", now=now, campground=campground, total=total_campgrounds)
 
 
-@app.route("/edit", methods=["GET", "POST"])
-def edit_campground():
-    if request.method == "POST":
-        campground_id = request.form["id"]
-        target_campground = Campground.query.get(campground_id)
-        target_campground.name = request.form["name"]
-        target_campground.image = request.form["image"]
-        target_campground.description = request.form["description"]
+@app.route("/edit/<int:campground_id>", methods=["GET", "POST"])
+def edit_campground(campground_id):
+    total_campgrounds = db.session.query(Campground).count()
+    # Retrieve data from database and fill form
+    original_campground = Campground.query.get(campground_id)
+    edit_campground = CampgroundForm(
+        name=original_campground.name,
+        image=original_campground.image,
+        description=original_campground.description,
+        postedDate=now
+    )
+    # Store data which was edited by a user
+    if edit_campground.validate_on_submit():
+        original_campground.name = edit_campground.name.data
+        original_campground.image = edit_campground.image.data
+        original_campground.description = edit_campground.description.data
+        original_campground.postedDate = now
         db.session.commit()
-    campground_id = request.args.get("id")
-    selected_campground = Campground.query.get(campground_id)
-    return render_template("show.html", campground=selected_campground)
+        return redirect(url_for("show_campground", campground_id=campground_id, now=now, total=total_campgrounds))
+    return render_template("new.html", form=edit_campground, now=now, id=campground_id, is_edit=True)
 
 
 @app.route("/delete")
