@@ -1,0 +1,16 @@
+{% import 'bootstrap/wtf.html' as wtf %}
+{% include "header.html" %}
+
+<div class='container w-75 bg-light rounded p-5'>
+    <form action={{url_for("login")}} method='POST' class="w-50 mx-auto mt-5 mb-3">
+        <h1 class='text-center'>Login</h1>
+
+        <div class="mb-3 d-flex flex-column">
+            {{ form.csrf_token }}
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+        </div>
+    </form>
+</div>
+
+
+{% include "footer.html" %}
