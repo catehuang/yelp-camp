@@ -95,9 +95,8 @@ def edit_campground(campground_id):
     return render_template("new.html", form=edit_campground, now=now, id=campground_id, is_edit=True)
 
 
-@app.route("/delete")
-def delete_campground():
-    campground_id = request.args.get("id")
+@app.route("/delete/<int:campground_id>")
+def delete_campground(campground_id):
     target_campground = Campground.query.get(campground_id)
     db.session.delete(target_campground)
     db.session.commit()
