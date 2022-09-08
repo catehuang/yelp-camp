@@ -1,3 +1,5 @@
+
+{% import 'bootstrap/wtf.html' as wtf %}
 {% include "header.html" %}
 
 <div class="container w-75 bg-light rounded py-5 mb-5">
@@ -12,23 +14,12 @@
         {{form.csrf_token}}
 
         <div class="mb-3 d-flex flex-column">
-            {{form.name.label}}
-            {{form.name}}
-            {% for err in form.name.errors %}
-            <span class="text-warning">{{ err }}</span>
-            {% endfor %}
+            {{ ckeditor.load() }}
+            {{ ckeditor.config(name='description') }}
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+
         </div>
-        <div class="mb-3 d-flex flex-column">
-            {{form.image.label}}
-            {{form.image}}
-        </div>
-        <div class="mb-3 d-flex flex-column">
-            {{form.description.label}}
-            {{form.description(rows="4", cols="40")}}
-        </div>
-        <div class="my-5">
-            {{form.submit(class="btn btn-primary btn-block")}}
-        </div>
+
         <div class="text-center">
             <a href={{url_for("home")}}>Go Back</a>
         </div>

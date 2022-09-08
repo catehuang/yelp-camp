@@ -3,13 +3,14 @@ from flask_bootstrap import Bootstrap
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, URL
-from wtforms.widgets import TextArea
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
+from flask_ckeditor import CKEditor, CKEditorField
 
 app = Flask("__name__")
 app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
 Bootstrap(app)
+ckeditor = CKEditor(app)
 
 now = datetime.now()
 PORT = 5000
@@ -34,8 +35,8 @@ db.create_all()
 class CampgroundForm(FlaskForm):
     name = StringField("Campground Name", validators=[DataRequired()])
     image = StringField("Campground Image URL", validators=[DataRequired()])
-    description = StringField("Campground Description", widget=TextArea(), validators=[DataRequired()])
-    submit = SubmitField("Create")
+    description = CKEditorField("Campground Description", validators=[DataRequired()])
+    submit = SubmitField("Submit")
 
 
 @app.route('/landing')
@@ -54,9 +55,9 @@ def new_campground():
     form = CampgroundForm()
     if form.validate_on_submit():
         new_campground = Campground(
-            name=request.form["name"],
-            image=request.form["image"],
-            description=request.form["description"],
+            name=request.name.data,
+            image=request.image.data,
+            description=request.description.data,
             postedDate=now
         )
         db.session.add(new_campground)
