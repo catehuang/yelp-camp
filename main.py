@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_ckeditor import CKEditor, CKEditorField
+from forms import CampgroundForm, RegisterForm, LoginForm
 
 app = Flask("__name__")
 app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
@@ -16,12 +17,13 @@ now = datetime.now()
 PORT = 5000
 
 # Connect to SQLite
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///campgrounds.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yelpCamp.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 
 class Campground(db.Model):
+    __tablename__ = "campgrounds"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     image = db.Column(db.String(255), nullable=False)
@@ -29,14 +31,16 @@ class Campground(db.Model):
     author = db.Column(db.String(255), nullable=True)
     postedDate = db.Column(db.Date, nullable=True)
 
+
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+
 db.create_all()
-
-
-class CampgroundForm(FlaskForm):
-    name = StringField("Campground Name", validators=[DataRequired()])
-    image = StringField("Campground Image URL", validators=[DataRequired()])
-    description = CKEditorField("Campground Description", validators=[DataRequired()])
-    submit = SubmitField("Submit")
 
 
 @app.route('/landing')
@@ -102,6 +106,32 @@ def delete_campground(campground_id):
     db.session.delete(target_campground)
     db.session.commit()
     return redirect(url_for("home"))
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    new_user = User(
+        name=request.form.get("name"),
+        email=request.form.get("email"),
+        password=request.form.get("password")
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    # return redirect(url_for("home"))
+    return render_template("register.html", now=now)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    return render_template("login.html", now=now, form=form)
+
+
+@app.route("/logout")
+def logout():
+    return redirect("home", now=now)
+
+
 
 
 if __name__ == "__main__":
