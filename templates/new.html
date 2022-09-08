@@ -1,4 +1,3 @@
-
 {% import 'bootstrap/wtf.html' as wtf %}
 {% include "header.html" %}
 
@@ -17,7 +16,6 @@
             {{ ckeditor.load() }}
             {{ ckeditor.config(name='description') }}
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
-
         </div>
 
         <div class="text-center">

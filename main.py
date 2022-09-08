@@ -55,9 +55,9 @@ def new_campground():
     form = CampgroundForm()
     if form.validate_on_submit():
         new_campground = Campground(
-            name=request.name.data,
-            image=request.image.data,
-            description=request.description.data,
+            name=request.form.get("name"),
+            image=request.form.get("image"),
+            description=request.form.get("description"),
             postedDate=now
         )
         db.session.add(new_campground)
