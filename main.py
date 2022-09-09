@@ -19,8 +19,12 @@ now = datetime.now()
 PORT = 5000
 
 # Connect to SQLite
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///yelpCamp.db")
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yelpCamp.db"
+env_postgres = os.environ.get("DATABASE_URL")
+if env_postgres.startswith("postgres://"):
+    env_postgres = env_postgres.replace("postgres://", "postgresql://")
+app.config["SQLALCHEMY_DATABASE_URI"] = env_postgres
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager()
