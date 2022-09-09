@@ -1,17 +1,17 @@
 from functools import wraps
-from flask import Flask, render_template, url_for, request, redirect, abort
+from flask import Flask, render_template, url_for, request, redirect, abort, flash
 from flask_bootstrap import Bootstrap
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from sqlalchemy.orm import relationship
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_ckeditor import CKEditor, CKEditorField
 from forms import CampgroundForm, RegisterForm, LoginForm
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-
+from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user, \
+    AnonymousUserMixin
 
 app = Flask("__name__")
 app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
@@ -66,12 +66,17 @@ def admin(f):
     return decorated_function
 
 
+
+class Anonymous(AnonymousUserMixin):
+  def __init__(self):
+    self.username = 'Guest'
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter_by(email=form.email.data).first():
-            print("This email has been registered.")
+            flash("This email has been registered. Please try again.")
             return redirect(url_for("register"))
         hash_and_salted_password = generate_password_hash(
             form.password.data,
@@ -86,20 +91,41 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-        print("Register successfully.")
-        return render_template(url_for("home"))
+        flash("Register successfully.")
+        return redirect(url_for("home"))
     return render_template("register.html", now=now, form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    return render_template("login.html", now=now, form=form)
+    if form.validate_on_submit():
+        email = form.email.data
+        password = form.password.data
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash("Email or password incorrect. Please try again.")
+            return redirect(url_for("login"))
+        elif not check_password_hash(user.password, password):
+            flash("Email or password incorrect. Please try again.")
+            return redirect(url_for("login"))
+        else:
+            login_user(user)
+            flash("Logged in successfully.")
+            return redirect(url_for("home"))
+    return render_template("login.html", now=now, form=form, current_user=current_user)
+
+
+@app.route("/user/<username>")
+def user_account(username):
+    return render_template("user.html", current_user=current_user)
 
 
 @app.route("/logout")
 def logout():
-    return redirect("home", now=now)
+    logout_user()
+    flash("Logout successfully.")
+    return redirect(url_for("home"))
 
 
 @app.route('/')

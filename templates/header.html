@@ -14,9 +14,15 @@
 
             <div class="collapse navbar-collapse justify-content-end" id="navContent">
                 <div class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <a href={{url_for('user_account', username=current_user.name )}} class="nav-link">Welcome, {{ current_user.name }}</a>
+                    <a href={{url_for('logout')}} class="nav-link">Logout</a>
+
+                    {% else %}
                     <a href={{url_for('login')}} class="nav-link">Login</a>
                     <a href={{url_for('register')}} class="nav-link">Sign Up</a>
-                    <a href={{url_for('logout')}} class="nav-link">Logout</a>
+
+                    {% endif %}
                 </div>
             </div>
         </nav>

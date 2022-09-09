@@ -12,7 +12,7 @@
     {% if campgrounds == [] %}
     <h5 class="text-center mb-5">There is no campground data.</h5>
     {% else %}
-    <div class="row align-items-center text-center" style="display:flex; flex-wrap: wrap;">
+    <div class="row align-items-center text-center">
             {% for campground in campgrounds %}
             <div class="col-md-3 col-sm-6 h-50">
                 <div class="img-thumbnail">
@@ -21,7 +21,7 @@
                     </figure>
 
                     <div class="caption mb-2">
-                         <h4> {{ campground.name }} </h4>
+                         <p class="font-weight-bold text-wrap text-left px-2" style="line-height: 1.5em; overflow: hidden; height: 3em;"> {{ campground.name }} </p>
                     </div>
                     <p>
                         <a href="{{url_for('show_campground', campground_id=campground.id)}}">More Info</a>
