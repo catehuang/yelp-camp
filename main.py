@@ -8,9 +8,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_ckeditor import CKEditor
 from forms import CampgroundForm, RegisterForm, LoginForm
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+import os
 
 app = Flask("__name__")
-app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 Bootstrap(app)
 ckeditor = CKEditor(app)
 
@@ -18,7 +19,8 @@ now = datetime.now()
 PORT = 5000
 
 # Connect to SQLite
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yelpCamp.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///yelpCamp.db")
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yelpCamp.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager()
