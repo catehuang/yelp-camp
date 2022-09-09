@@ -114,7 +114,7 @@ def login():
 @app.route("/user/<user_id>")
 def user_account(user_id):
     error = None
-    if current_user:
+    if current_user.is_authenticated:
         if int(user_id) == int(current_user.id):
             campgrounds = Campground.query.filter_by(author_id=current_user.id)
             return render_template("user.html", now=now, current_user=current_user, campgrounds=campgrounds)
@@ -146,20 +146,23 @@ def home():
 
 @app.route('/new', methods=["GET", "POST"])
 def new_campground():
-    form = CampgroundForm()
-    if form.validate_on_submit():
-        new_campground = Campground(
-            name=request.form.get("name"),
-            image=request.form.get("image"),
-            description=request.form.get("description"),
-            postedDate=now,
-            author=current_user
-        )
-        db.session.add(new_campground)
-        db.session.commit()
-        # print({"Success": "Successfully create a new campground."})
+    if current_user.is_authenticated:
+        form = CampgroundForm()
+        if form.validate_on_submit():
+            new_campground = Campground(
+                name=request.form.get("name"),
+                image=request.form.get("image"),
+                description=request.form.get("description"),
+                postedDate=now,
+                author=current_user
+            )
+            db.session.add(new_campground)
+            db.session.commit()
+            # print({"Success": "Successfully create a new campground."})
+            return redirect(url_for("home"))
+        return render_template("new.html", now=now, form=form, current_user=current_user)
+    else:
         return redirect(url_for("home"))
-    return render_template("new.html", now=now, form=form, current_user=current_user)
 
 
 @app.route("/<int:campground_id>")
