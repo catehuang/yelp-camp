@@ -3,15 +3,11 @@ from flask import Flask, render_template, url_for, request, redirect, abort, fla
 from flask_bootstrap import Bootstrap
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
-from flask_ckeditor import CKEditor, CKEditorField
+from flask_ckeditor import CKEditor
 from forms import CampgroundForm, RegisterForm, LoginForm
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user, \
-    AnonymousUserMixin
+from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 
 app = Flask("__name__")
 app.config["SECRET_KEY"] = "ASQ2A@S!&(%&WR@34FT1251AS#^&@DGF"
@@ -167,9 +163,10 @@ def new_campground():
 
 @app.route("/<int:campground_id>")
 def show_campground(campground_id):
-    total_campgrounds = db.session.query(Campground).count()
     campground = Campground.query.get(campground_id)
-    return render_template("show.html", now=now, campground=campground, total=total_campgrounds)
+    campgrounds = Campground.query.all()
+    index = campgrounds.index(campground)
+    return render_template("show.html", now=now, campground=campground, index=index, total=len(campgrounds))
 
 
 @app.route("/edit/<int:campground_id>", methods=["GET", "POST"])
