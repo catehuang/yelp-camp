@@ -11,7 +11,7 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 import os
 
 app = Flask("__name__")
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 Bootstrap(app)
 ckeditor = CKEditor(app)
 
@@ -19,7 +19,7 @@ now = datetime.now()
 PORT = 5000
 
 # Connect to SQLite
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///yelpCamp.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///yelpCamp.db")
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yelpCamp.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
