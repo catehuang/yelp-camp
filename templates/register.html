@@ -8,9 +8,9 @@
             {{ form.csrf_token }}
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
 
-            {% for msg in get_flashed_messages() %}
-            <p class="text-danger mt-2">{{ msg }}</p>
-            {% endfor %}
+            {% if error %}
+            <p class="text-danger mt-2">{{ error }}</p>
+            {% endif %}
         </div>
     </form>
 </div>

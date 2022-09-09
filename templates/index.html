@@ -21,7 +21,7 @@
                     </figure>
 
                     <div class="caption mb-2">
-                         <p class="font-weight-bold text-wrap text-left px-2" style="line-height: 1.5em; overflow: hidden; height: 3em;"> {{ campground.name }} </p>
+                         <p class="font-weight-bold text-wrap text-center px-2" style="line-height: 1.5em; overflow: hidden; height: 3em;"> {{ campground.name }} </p>
                     </div>
                     <p>
                         <a href="{{url_for('show_campground', campground_id=campground.id)}}">More Info</a>
@@ -31,6 +31,11 @@
             {% endfor %}
     </div>
     {% endif %}
+    <div>
+        {% if error %}
+        <p class="text-danger">{{ error }}</p>
+        {% endif %}
+    </div>
 </div>
 
 {% include "footer.html" %}

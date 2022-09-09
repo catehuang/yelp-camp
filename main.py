@@ -66,59 +66,64 @@ def admin(f):
     return decorated_function
 
 
-
-class Anonymous(AnonymousUserMixin):
-  def __init__(self):
-    self.username = 'Guest'
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
+    error = None
     if form.validate_on_submit():
         if User.query.filter_by(email=form.email.data).first():
-            flash("This email has been registered. Please try again.")
-            return redirect(url_for("register"))
-        hash_and_salted_password = generate_password_hash(
-            form.password.data,
-            method='pbkdf2:sha256',
-            salt_length=8
-        )
-        new_user = User(
-            name=form.name.data,
-            email=form.email.data,
-            password=hash_and_salted_password
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user)
-        flash("Register successfully.")
-        return redirect(url_for("home"))
-    return render_template("register.html", now=now, form=form)
+            error = "This email has been registered. Please try again."
+        else:
+            hash_and_salted_password = generate_password_hash(
+                form.password.data,
+                method='pbkdf2:sha256',
+                salt_length=8
+            )
+            new_user = User(
+                name=form.name.data,
+                email=form.email.data,
+                password=hash_and_salted_password
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            # flash("Register successfully.")
+            return redirect(url_for("home"))
+    return render_template("register.html", now=now, form=form, error=error)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
+    error = None
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
         user = User.query.filter_by(email=email).first()
         if not user:
-            flash("Email or password incorrect. Please try again.")
-            return redirect(url_for("login"))
+            error = "Email or password incorrect. Please try again."
         elif not check_password_hash(user.password, password):
-            flash("Email or password incorrect. Please try again.")
-            return redirect(url_for("login"))
+            error = "Email or password incorrect. Please try again."
         else:
             login_user(user)
-            flash("Logged in successfully.")
+            # flash("Logged in successfully.")
             return redirect(url_for("home"))
-    return render_template("login.html", now=now, form=form, current_user=current_user)
+    return render_template("login.html", now=now, form=form, current_user=current_user, error=error)
 
 
-@app.route("/user/<username>")
-def user_account(username):
-    return render_template("user.html", current_user=current_user)
+@app.route("/user/<user_id>")
+def user_account(user_id):
+    error = None
+    if current_user:
+        if int(user_id) == int(current_user.id):
+            campgrounds = Campground.query.filter_by(author_id=current_user.id)
+            return render_template("user.html", now=now, current_user=current_user, campgrounds=campgrounds)
+        else:
+            error = "Permission denied."
+    else:
+        error = "Permission denied. Please login first."
+
+    return redirect(url_for("home"))
 
 
 @app.route("/logout")
