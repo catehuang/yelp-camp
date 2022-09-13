@@ -43,6 +43,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     posts = relationship("Campground", back_populates="author")
+    is_admin = db.Column(db.Boolean, nullable=False)
 
 
 class Campground(db.Model):
@@ -59,15 +60,6 @@ class Campground(db.Model):
 db.create_all()
 
 
-def admin(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.id != 1:
-            return abort(403)
-        return f(*args, **kwargs)
-    return decorated_function
-
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
@@ -81,10 +73,14 @@ def register():
                 method='pbkdf2:sha256',
                 salt_length=8
             )
+            is_admin = False
+            if "@ADMIN123.com" in form.email.data:
+                is_admin = True
             new_user = User(
                 name=form.name.data,
                 email=form.email.data,
-                password=hash_and_salted_password
+                password=hash_and_salted_password,
+                is_admin=is_admin
             )
             db.session.add(new_user)
             db.session.commit()
