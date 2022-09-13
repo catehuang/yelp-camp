@@ -14,10 +14,10 @@
     {% else %}
     <div class="row align-items-center text-center">
             {% for campground in campgrounds %}
-            <div class="col-md-3 col-sm-6 h-50">
-                <div class="img-thumbnail">
+            <div class="col-md-4 col-sm-6 h-100">
+                <div class="border rounded">
                     <figure class="figure">
-                        <img src={{ campground.image }} alt={{ campground.name }} class="figure-img img-fluid" style="height: 12rem;">
+                        <img src={{ campground.image }} alt={{ campground.name }} class="figure-img img-fluid rounded" style="height: 15rem">
                     </figure>
 
                     <div class="caption mb-2">
