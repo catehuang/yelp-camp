@@ -46,7 +46,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     posts = relationship("Campground", back_populates="author")
-    is_admin = db.Column(db.Boolean, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
 
 class Campground(db.Model):
