@@ -12,7 +12,7 @@
 <!--                <span class="navbar-toggler-icon"></span>-->
 <!--            </button>-->
 
-            <div class="justify-content-end" id="navContent">
+            <div class="nav ml-auto" id="navContent">
                 <div class="navbar-nav">
                     {% if current_user.is_authenticated %}
                     <a href={{url_for('user_account', user_id=current_user.id )}} class="nav-link">Welcome, {{ current_user.name.title() }}</a>
